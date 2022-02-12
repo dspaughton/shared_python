@@ -1,5 +1,5 @@
 # shared_python
-Shared python scripts
+Shared python scripts.
 
 WordleSolver.py is a python3 script which runs on windows and (threoretically) on Linux too.
     It incorporates a number of tools which may help to solve wordle puzzles.
