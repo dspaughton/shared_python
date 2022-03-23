@@ -1,3 +1,17 @@
+"""
+The vector module implements basic 3D vectors.
+
+Class Vector implements 3D vectors.
+
+Function MakeVector(text,sep='') takes text
+and returns the vector that it specfiies.
+
+Function LoadObj(filename) returns a list of
+the 3D vectors found in a wavefront OBJ file.
+"""
+
+
+
 # import sys
 # sys.path.append(PATH-TO-THIS-FILE)
 # import vector as ...
@@ -23,10 +37,7 @@ class Vector:
         return the vector's direction, i.e. the original vector divided by its size
 
     format(fmt):
-        return a user-formatted string representation of the vector
-        e.g:
-        U = Vector(1,2,3)
-        U.format('{:.2f},{:.2f},{:.2f}')  -> '1.00,2.00,3.00'
+        return a user-formatted text representation of the vector
 
     Special methods:
     ----------------
@@ -76,9 +87,11 @@ class Vector:
 
 
     def __pos__(self):
+        """    Unary plus, returns a copy of the Vector."""
         return Vector( self.x,  self.y,  self.z)
 
     def __neg__(self):
+        """    Unary minus, returns a negated copy of the Vector."""
         return Vector(-self.x, -self.y, -self.z)
 
 
@@ -98,17 +111,17 @@ class Vector:
 
 
     def __add__(self,rhs):
-        """Return the sum of two vectors."""
+        """Return the vector sum: self + rhs."""
         return Vector(self.x+rhs.x, self.y+rhs.y, self.z+rhs.z)
 
 
     def __sub__(self,rhs):
-        """Return the difference between two vectors."""
+        """Return the vector difference: self - rhs."""
         return Vector(self.x-rhs.x, self.y-rhs.y, self.z-rhs.z)
 
 
     def dot(self,rhs):
-        """Return the scalar dot product of two vectors.
+        """Return the scalar dot product of self and rhs.
     e.g:
     U = Vector(1,2,3)
     V = Vector(4,5,6)
@@ -119,7 +132,7 @@ class Vector:
 
 
     def X(self,rhs):
-        """Return the vector cross product of two vectors.
+        """Return the vector cross product between self and rhs.
     e.g:
     U = Vector(1,2,3)
     V = Vector(4,5,6)
@@ -133,8 +146,7 @@ class Vector:
 
 
     def norm(self):
-        """Return the vector cross product of two vectors.
-    return the vector's 'norm' (aka 'size' or 'magnitude')
+        """Return the vector's 'norm' (aka 'size' or 'magnitude')
     e.g:
     U = Vector(1,2,3)
     U.norm() -> 3.7416573867739413
@@ -153,10 +165,16 @@ class Vector:
 
 
     def __repr__(self):
+        """Return a text representation of the vector."""
         return 'Vector(' + str(self.x) + ',' + str(self.y) + ',' + str(self.z) + ')'
 
 
     def format(self,fmt):
+        """Return a user-formatted text representation of the vector.
+        e.g:
+        U = Vector(1,2,3)
+        U.format('{:.2f},{:.2f},{:.2f}')  -> '1.00,2.00,3.00'
+        """
         return fmt.format(self.x,self.y,self.z)
 
 
@@ -208,7 +226,7 @@ def MakeVector(text,sep=''):
 
 def LoadObj(filename):
     """MakeVector(text,sep='')
-    Returns a list of the vectors found in a wavefront 'obj' file
+    Returns a list of the vectors found in a wavefront OBJ file
     """
     VectorList = []
     with open(filename) as file:
