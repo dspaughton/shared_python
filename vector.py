@@ -4,7 +4,11 @@ The vector module implements basic 3D vectors.
 Class Vector implements 3D vectors.
 
 Function MakeVector(text,sep='') takes text
-and returns the vector that it specfiies.
+and returns the vector that it specifies.
+
+Function MakeDir(elevation,azimuth) makes
+a new unit vector pointing towards an elevation and azimuth
+(see the function documentation for details).
 
 Function LoadObj(filename) returns a list of
 the 3D vectors found in a wavefront OBJ file.
@@ -25,19 +29,27 @@ class Vector:
     Methods:
     --------
     dot(rhs):
-        return the (scalar) dot product with another vector 'rhs'
+        Return the (scalar) dot product with another vector 'rhs'
 
     X(rhs):
-        return the (vector) cross product with another vector 'rhs'
+        Return the (vector) cross product with another vector 'rhs'
 
     norm():
-        return the vector's 'norm' (aka 'size' or 'magnitude')
+        Return the vector's 'norm' (aka 'size' or 'magnitude')
 
     unit():
-        return the vector's direction, i.e. the original vector divided by its size
+        return a copy of the vector with unit size (i.e. its direction)
+
+    rotated(axis, angle):
+        Return a copy of the vector rotated by 'angle' degrees about an
+        axis vector (which must be unit).
+
+    rotated_ca(axis, cos, sin):
+        As above, but using user-computed cosine and sine of the angle.
+        (May be more eficient when rotating lots of vectors).
 
     format(fmt):
-        return a user-formatted text representation of the vector
+        Return a user-formatted text representation of the vector
 
     Special methods:
     ----------------
@@ -96,12 +108,12 @@ class Vector:
 
 
     def __mul__(self,s):
-        """Return the vector multiplied by a scalar."""
+        """Return the vector post-multiplied by a scalar."""
         return Vector(self.x*s, self.y*s, self.z*s)
 
 
     def __rmul__(self,s):
-        """Return the vector multiplied by a preceding scalar."""
+        """Return the vector pre-multiplied by a scalar."""
         return Vector(self.x*s, self.y*s, self.z*s)
 
 
@@ -164,6 +176,33 @@ class Vector:
         return Vector(self.x,self.y,self.z) * (1/self.norm() )
 
 
+    def rotated(self, Axis, angle):
+        """Return the vector rotated about a unit axis vector.
+    cos is the cosine of the rotation angle, sin is its sine.
+    """
+        a = angle * math.pi / 180
+        ca = math.cos(a)
+        sa = math.sin(a)
+        return self.rotated_ca(Axis, ca, sa)
+
+    def rotated_ca(self, Axis, cos, sin):
+        """As above, but using user-computed cosine and sine of the angle.
+    """
+        size = self.norm()
+        # rotating a zero-length vector is trivial
+        if 0==size:
+            return Vector()
+        P = Axis * self.dot(Axis) # Axis-parallel component
+        N = self-P                # Axis-normal component
+        T = N.X(Axis)             # T is normal to both Axis and N
+        # do a 2D rotation with N and T, preserving P
+        Rx = N.x*cos - sin*T.x + P.x;
+        Ry = N.y*cos - sin*T.y + P.y;
+        Rz = N.z*cos - sin*T.z + P.z;
+        return Vector(Rx,Ry,Rz)
+
+
+
     def __repr__(self):
         """Return a text representation of the vector."""
         return 'Vector(' + str(self.x) + ',' + str(self.y) + ',' + str(self.z) + ')'
@@ -218,6 +257,22 @@ def MakeVector(text,sep=''):
     return Vector(x,y,z)
 
 
+def MakeDir(elevation,azimuth):
+    """MakeDirection(elevation,azimuth) (both angles in degrees)
+    Returns a new unit vector made from elevation and azimuth,
+    (or from the centre of the earth to a latitude and longitude),
+    following the convention:
+    the x-axis points right  (or  0 North, 90 East)
+    the y-axis points up     (or 90 North)
+    the z-axis points behind (or 0 North,  0 degrees East)
+    """
+    elev = elevation * math.pi / 180
+    azim = azimuth   * math.pi / 180
+    ce = math.cos(elev)
+    se = math.sin(elev)
+    ca = math.cos(azim)
+    sa = math.sin(azim)
+    return Vector(ce*sa, se, ce*ca)
 
 
 
